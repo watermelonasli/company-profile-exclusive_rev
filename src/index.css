@@ -1,0 +1,2098 @@
+:root {
+  --bg: #0a0c11;
+  --bg-soft: #12151d;
+  --surface: #171b26;
+  --surface-2: #1d2230;
+  --ink: #eef0f5;
+  --muted: #8b93a7;
+  --accent: #7cffc4;
+  --accent-soft: rgba(124, 255, 196, 0.14);
+  --accent2: #7c9cff;
+  --gradient-brand: linear-gradient(135deg, #7cffc4 0%, #7c9cff 100%);
+  --line: rgba(238, 240, 245, 0.09);
+  --line-strong: rgba(238, 240, 245, 0.16);
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-serif: "Instrument Serif", serif;
+
+  --container: 1180px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  /* Ambient color blobs yang menempel di background dokumen (bukan
+     fixed-to-viewport), jadi ikut scroll secara natural dan nyaris tanpa
+     biaya performa. Ini yang membuat area di luar hero tidak terasa
+     sebagai kotak hitam polos — termasuk saat halaman dibuka di mobile,
+     karena solusi ini murni CSS dan tidak bergantung hover/kursor. */
+  background:
+    radial-gradient(560px circle at 12% 6%, rgba(124, 255, 196, 0.07), transparent 60%),
+    radial-gradient(520px circle at 90% 28%, rgba(124, 156, 255, 0.06), transparent 60%),
+    radial-gradient(480px circle at 20% 70%, rgba(181, 124, 255, 0.045), transparent 60%),
+    radial-gradient(520px circle at 88% 92%, rgba(124, 255, 196, 0.05), transparent 60%),
+    var(--bg);
+  background-repeat: no-repeat;
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.65;
+  position: relative;
+}
+
+/* Grain texture overlay — lapisan tipis yang bikin permukaan dark theme
+   terasa punya "tekstur", bukan flat vector. Efek ini yang paling murah
+   secara performa tapi paling terasa memberi kesan premium/print-like. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.wrap {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.text-accent {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Route transition ---------- */
+.route-fade {
+  animation: routeFadeIn 0.5s ease both;
+}
+
+@keyframes routeFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Scroll progress bar ---------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 100;
+  background: transparent;
+}
+
+.scroll-progress-fill {
+  height: 100%;
+  background: var(--gradient-brand);
+  box-shadow: 0 0 12px rgba(124, 255, 196, 0.6);
+  transition: width 0.1s linear;
+}
+
+/* ---------- Reveal animation ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Route loading fallback ---------- */
+.page-fallback {
+  min-height: 60vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 120px;
+}
+
+.page-fallback-bar {
+  width: 160px;
+  height: 2px;
+  background: var(--line);
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.page-fallback-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: var(--gradient-brand);
+  animation: loadbar 1s ease-in-out infinite;
+}
+
+@keyframes loadbar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* ---------- Typography helpers ---------- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--gradient-brand);
+}
+
+.eyebrow-badge {
+  display: inline-flex;
+  border: 1px solid var(--line-strong);
+  background: rgba(124, 255, 196, 0.06);
+  padding: 7px 16px 7px 14px;
+  border-radius: 999px;
+}
+
+.eyebrow-badge::before {
+  display: none;
+}
+
+.text-link {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 2px;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.text-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.btn-accent {
+  background: var(--gradient-brand);
+  color: #06110c;
+  box-shadow: 0 8px 30px -10px rgba(124, 255, 196, 0.55);
+}
+
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px -8px rgba(124, 255, 196, 0.65);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.btn-outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* Efek "shine sweep": highlight diagonal yang melintas saat hover,
+   trik klasik untuk kesan tombol premium tanpa menambah berat file. */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.btn-shine:hover::after {
+  left: 130%;
+}
+
+/* ---------- Sections ---------- */
+.section {
+  padding: 100px 0;
+  position: relative;
+}
+
+/* Ornamen pembatas halus di setiap pertemuan antar-section — memberi
+   ritme visual di sepanjang halaman (penting justru saat layout jadi
+   satu kolom panjang di mobile) tanpa perlu markup tambahan di tiap
+   halaman, karena diterapkan otomatis lewat selector adjacent-sibling. */
+.section + .section::before,
+.stats-strip + .section::before,
+.marquee-section + .stats-strip::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.section + .section::after,
+.stats-strip + .section::after,
+.marquee-section + .stats-strip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--gradient-brand);
+  z-index: 2;
+}
+
+.section-tint {
+  position: relative;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+/* Section dengan background solid (bg-soft) menutupi gradient ambient
+   milik body, jadi tiap section-tint dapat "sisipan" glow sendiri di
+   sudut kanan-atas — konsisten dengan aurora di hero, dan tetap murni
+   CSS supaya identik di mobile tanpa bergantung interaksi apa pun. */
+.section-tint::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -100px;
+  width: 340px;
+  height: 340px;
+  background: radial-gradient(circle, rgba(124, 255, 196, 0.08), transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.section-top-tight {
+  padding-top: 40px;
+}
+
+@media (max-width: 720px) {
+  .section {
+    padding: 64px 0;
+  }
+}
+
+.section-head h2 {
+  font-size: clamp(26px, 3.8vw, 38px);
+  line-height: 1.2;
+  margin: 12px 0 0;
+}
+
+.section-head-center {
+  max-width: 620px;
+  margin: 0 auto 52px;
+  text-align: center;
+}
+
+.section-head-center .eyebrow {
+  justify-content: center;
+}
+
+.section-head-center .eyebrow::before {
+  display: none;
+}
+
+.section-head-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+}
+
+.page-header-desc {
+  margin-top: 16px;
+  max-width: 58ch;
+  color: var(--muted);
+}
+
+/* ---------- Navbar (glass) ---------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 12, 17, 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.navbar.is-scrolled {
+  border-bottom: 1px solid var(--line-strong);
+  box-shadow: 0 1px 0 0 rgba(124, 255, 196, 0.12);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  color: var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(124, 255, 196, 0.06), 0 4px 14px -6px rgba(124, 255, 196, 0.4);
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-size: 14px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted);
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -2px;
+  height: 1px;
+  background: var(--gradient-brand);
+  transition: right 0.22s ease;
+}
+
+.nav-links a:hover {
+  color: var(--ink);
+}
+
+.nav-links a:hover::after {
+  right: 0;
+}
+
+.nav-links a[aria-current="page"] {
+  color: var(--accent);
+}
+
+.nav-links a[aria-current="page"]::after {
+  right: 0;
+}
+
+.nav-more {
+  position: relative;
+}
+
+.nav-more-trigger {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.nav-more-trigger:hover {
+  color: var(--ink);
+}
+
+.nav-more-menu {
+  position: absolute;
+  top: 100%;
+  left: -14px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5);
+}
+
+.nav-more-menu a {
+  padding: 9px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.nav-more-menu a:hover {
+  background: var(--bg-soft);
+  color: var(--accent);
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.nav-toggle span {
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+}
+
+.nav-mobile {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .nav-links,
+  .nav-cta {
+    display: none;
+  }
+  .nav-toggle {
+    display: flex;
+  }
+  .nav-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 28px 20px;
+  }
+  .nav-mobile a {
+    padding: 12px 0;
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  .nav-mobile .btn {
+    margin-top: 14px;
+    justify-content: center;
+  }
+}
+
+/* ---------- Hero (aurora + dot-grid + cursor spotlight) ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-aurora {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.35;
+  will-change: transform;
+}
+
+.aurora-a {
+  width: 480px;
+  height: 480px;
+  background: var(--accent);
+  top: -160px;
+  left: -80px;
+  animation: auroraDrift1 16s ease-in-out infinite alternate;
+}
+
+.aurora-b {
+  width: 420px;
+  height: 420px;
+  background: var(--accent2);
+  top: 60px;
+  right: -140px;
+  animation: auroraDrift2 20s ease-in-out infinite alternate;
+}
+
+.aurora-c {
+  width: 300px;
+  height: 300px;
+  background: #b57cff;
+  bottom: -160px;
+  left: 30%;
+  opacity: 0.22;
+  animation: auroraDrift3 24s ease-in-out infinite alternate;
+}
+
+@keyframes auroraDrift1 {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(60px, 40px) scale(1.15); }
+}
+
+@keyframes auroraDrift2 {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-50px, 60px) scale(1.1); }
+}
+
+@keyframes auroraDrift3 {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(40px, -30px) scale(1.2); }
+}
+
+.hero-grid-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 60% 60% at 30% 20%, black, transparent 75%);
+}
+
+/* Spotlight lembut yang mengikuti kursor, dikendalikan lewat CSS var
+   --spot-x/--spot-y yang diupdate onMouseMove di Home.jsx. */
+.hero-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    360px circle at var(--spot-x, 50%) var(--spot-y, 30%),
+    rgba(124, 255, 196, 0.1),
+    transparent 70%
+  );
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  padding: 110px 0 96px;
+  max-width: 720px;
+}
+
+.hero-inner h1 {
+  font-size: clamp(36px, 5.2vw, 58px);
+  line-height: 1.12;
+  margin: 18px 0 0;
+}
+
+.hero-desc {
+  margin-top: 22px;
+  font-size: 16.5px;
+  color: var(--muted);
+  max-width: 52ch;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 34px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Marquee (trusted-by ticker) ---------- */
+.marquee-section {
+  padding: 36px 0 56px;
+  border-bottom: 1px solid var(--line);
+}
+
+.marquee-label {
+  text-align: center;
+}
+
+.marquee-label .eyebrow {
+  justify-content: center;
+}
+
+.marquee-label .eyebrow::before {
+  display: none;
+}
+
+.marquee {
+  position: relative;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 56px;
+  animation: marqueeScroll 28s linear infinite;
+}
+
+.marquee-set {
+  display: flex;
+  gap: 56px;
+  flex-shrink: 0;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-item {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--muted);
+  white-space: nowrap;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.marquee-item:hover {
+  opacity: 1;
+  color: var(--ink);
+}
+
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- Stats strip ---------- */
+.stats-strip {
+  position: relative;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+
+.stats-strip::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 620px;
+  height: 220px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(124, 156, 255, 0.06), transparent 70%);
+  pointer-events: none;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 44px 0;
+}
+
+.stat-item {
+  text-align: center;
+  border-left: 1px solid var(--line);
+}
+
+.stat-item:first-child {
+  border-left: none;
+}
+
+.stat-number {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(26px, 3.4vw, 38px);
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+}
+
+.stat-label {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 14px;
+    column-gap: 14px;
+  }
+  /* Border-left divider antar kolom cuma masuk akal dalam satu baris.
+     Begitu grid melipat jadi 2 kolom di mobile, dividernya diganti jadi
+     kartu penuh (border keliling + background) supaya tiap angka tetap
+     terlihat sebagai elemen berbingkai, bukan angka polos melayang. */
+  .stat-item {
+    border-left: none;
+    background: var(--surface);
+    border: 1px solid rgba(124, 255, 196, 0.14);
+    border-radius: 12px;
+    padding: 18px 8px;
+  }
+
+  .navbar-inner {
+    padding: 20px;
+  }
+
+  .hero-inner {
+    padding: 30px 15px;
+  }
+}
+
+/* ---------- Tilt + glow card system ----------
+   .tilt memberi perspective transform (dihandle inline lewat JS di
+   Tilt.jsx). .card-glow menambah gradient border tipis + halo yang
+   membesar saat hover/tilt — dipakai di berbagai kartu di seluruh situs
+   supaya sistemnya konsisten. */
+.tilt {
+  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
+}
+
+.card-glow {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+  /* Border beraksen tipis secara default (bukan abu-abu polos) supaya
+     kartu tetap terbaca sebagai elemen "premium" walau tidak sedang
+     di-hover — penting untuk perangkat sentuh yang tidak punya hover. */
+  border: 1px solid rgba(124, 255, 196, 0.16);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px -22px rgba(124, 255, 196, 0.3);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    260px circle at var(--glow-x, 50%) var(--glow-y, 15%),
+    rgba(124, 255, 196, 0.6),
+    transparent 60%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  /* Resting opacity > 0: efek border-glow tetap kelihatan walau kartu
+     belum disentuh/di-hover sama sekali — ini fix utama supaya tampilan
+     di mobile tidak "menunggu" interaksi yang tidak akan pernah terjadi. */
+  opacity: 0.45;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+/* Perangkat dengan mouse (pointer presisi): efek jadi lebih dramatis
+   saat hover, mengikuti posisi kursor lewat --glow-x/--glow-y dari
+   Tilt.jsx. Perangkat sentuh sengaja TIDAK memakai blok ini, supaya
+   tidak mengandalkan hover yang tidak pernah terjadi di mobile. */
+@media (hover: hover) and (pointer: fine) {
+  .card-glow:hover {
+    border-color: transparent;
+    box-shadow: 0 24px 60px -24px rgba(124, 255, 196, 0.4);
+  }
+
+  .card-glow:hover::before {
+    opacity: 1;
+  }
+}
+
+/* ---------- Services preview (home) ---------- */
+.services-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.service-preview-card {
+  padding: 32px 28px;
+}
+
+.service-preview-index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.service-preview-card h3 {
+  font-size: 19px;
+  margin: 14px 0 8px;
+}
+
+.service-preview-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 860px) {
+  .services-preview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Services (page) ---------- */
+.services-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 24px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.service-row:last-child {
+  border-bottom: none;
+}
+
+.service-row-code {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.service-row-body h2 {
+  font-size: 24px;
+  margin: 0 0 10px;
+}
+
+.service-row-body p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+.service-row-body ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.service-row-body li {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  padding: 6px 14px;
+}
+
+@media (max-width: 620px) {
+  .service-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* ---------- Portfolio cards ---------- */
+.portfolio-preview-grid,
+.portfolio-full-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.portfolio-card {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 14px;
+}
+
+.portfolio-card-img {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid rgba(124, 255, 196, 0.18);
+}
+
+.portfolio-card-img img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.portfolio-card-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(124, 255, 196, 0.16), transparent 55%);
+  /* Tetap sedikit terlihat secara default (bukan 0) supaya thumbnail
+     proyek tidak polos flat sebelum disentuh — diperkuat lagi saat
+     hover di perangkat dengan mouse. */
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .portfolio-card:hover .portfolio-card-img img {
+    transform: scale(1.06);
+  }
+
+  .portfolio-card:hover .portfolio-card-shine {
+    opacity: 1;
+  }
+}
+
+.portfolio-card-cat {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.portfolio-card h3 {
+  font-size: 18px;
+  margin: 8px 0 0;
+}
+
+.portfolio-card-lg p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .portfolio-preview-grid,
+  .portfolio-full-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .portfolio-preview-grid,
+  .portfolio-full-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Blog cards ---------- */
+.blog-preview-grid,
+.blog-list-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.blog-card {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.blog-card-img {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid rgba(124, 156, 255, 0.18);
+}
+
+.blog-card-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(10, 12, 17, 0.55));
+  pointer-events: none;
+}
+
+.blog-card-img img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .blog-card:hover .blog-card-img img {
+    transform: scale(1.06);
+  }
+}
+
+.blog-card-cat {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--accent2);
+}
+
+.blog-card h3 {
+  font-size: 17px;
+  margin: 8px 0 0;
+  line-height: 1.35;
+}
+
+.blog-card-lg p {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .blog-preview-grid,
+  .blog-list-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .blog-preview-grid,
+  .blog-list-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Filter chips ---------- */
+.filter-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.filter-chip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  padding: 9px 18px;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.filter-chip:hover {
+  border-color: var(--accent);
+}
+
+.filter-chip.is-active {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  color: #06110c;
+}
+
+/* ---------- Project / blog detail ---------- */
+.project-cover {
+  margin-bottom: 0;
+}
+
+.project-cover img {
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+.project-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 56px;
+}
+
+.project-detail-main {
+  /* min-width: 0 mencegah grid track melebar karena konten/teks panjang
+     yang tidak bisa dibungkus (default grid item adalah min-width: auto). */
+  min-width: 0;
+}
+
+.project-block {
+  margin-bottom: 32px;
+}
+
+.project-block h2 {
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.project-block p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+.project-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 26px;
+  height: fit-content;
+  background: var(--bg-soft);
+}
+
+.project-sidebar-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+.project-sidebar-value {
+  margin: 0;
+  font-size: 15px;
+}
+
+.project-stack-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-stack-tags span {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+
+@media (max-width: 900px) {
+  .project-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.article-body {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 16.5px;
+  color: #cdd2dd;
+}
+
+/* Drop-cap editorial pada paragraf pembuka artikel — sentuhan premium
+   khas majalah/jurnal, murni CSS tanpa markup tambahan. */
+.article-body p:first-of-type::first-letter {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 4.2em;
+  line-height: 0.78;
+  float: left;
+  margin: 6px 10px 0 0;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Values / team / careers ---------- */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.value-card {
+  padding: 30px 26px;
+}
+
+.value-index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.value-card h3 {
+  font-size: 20px;
+  margin: 12px 0 8px;
+}
+
+.value-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14.5px;
+}
+
+@media (max-width: 860px) {
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
+.team-card {
+  text-align: center;
+}
+
+.team-card-img {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1px solid var(--line-strong);
+  position: relative;
+}
+
+.team-card-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(10, 12, 17, 0.7));
+}
+
+.team-card-img img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  filter: grayscale(35%);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.team-card:hover .team-card-img img {
+  filter: grayscale(0%);
+  transform: scale(1.05);
+}
+
+.team-card h3 {
+  font-size: 15px;
+  margin: 0 0 4px;
+}
+
+.team-card p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+@media (max-width: 860px) {
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.opening-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.opening-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 20px;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.opening-row:hover {
+  border-color: var(--accent);
+  background: rgba(124, 255, 196, 0.04);
+}
+
+.opening-row h3 {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+.opening-row p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.opening-arrow {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 18px;
+  transition: transform 0.18s ease;
+}
+
+.opening-row:hover .opening-arrow {
+  transform: translateX(4px);
+}
+
+/* ---------- CTA section ---------- */
+.cta-section {
+  position: relative;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.cta-aurora {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(124, 255, 196, 0.16), transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.cta-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.cta-inner h2 {
+  font-size: clamp(24px, 3.4vw, 32px);
+}
+
+.cta-inner p {
+  color: var(--muted);
+  margin: 14px 0 28px;
+}
+
+/* ---------- Page header ---------- */
+.page-header {
+  padding: 56px 0 30px;
+}
+
+.page-header h1 {
+  font-size: clamp(30px, 4.4vw, 44px);
+  margin: 12px 0 0;
+}
+
+/* ---------- Testimonial grid ---------- */
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.testimonial-card {
+  padding: 34px 30px 28px;
+}
+
+.testimonial-mark {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 56px;
+  line-height: 1;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: block;
+  margin-bottom: -6px;
+}
+
+.testimonial-card blockquote {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.testimonial-card figcaption {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-family: var(--font-body);
+}
+
+.testimonial-card figcaption span:first-child {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+@media (max-width: 720px) {
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- FAQ ---------- */
+.faq-list {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 22px 4px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15.5px;
+  color: var(--ink);
+}
+
+.faq-icon {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.faq-answer {
+  margin: 0 4px 22px;
+  color: var(--muted);
+  font-size: 14.5px;
+  max-width: 62ch;
+}
+
+/* ---------- Contact form ---------- */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  gap: 56px;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-row-split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--line-strong);
+  background: var(--bg-soft);
+  padding: 13px 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  border-radius: 8px;
+  resize: vertical;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 255, 196, 0.14);
+}
+
+.contact-form .btn {
+  align-self: flex-start;
+  margin-top: 6px;
+  border: none;
+}
+
+.form-note {
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.form-note-ok {
+  color: var(--accent);
+}
+
+.form-note-error {
+  color: #ff8f7c;
+}
+
+.contact-side {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.contact-map {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  height: 220px;
+  overflow: hidden;
+  filter: grayscale(20%) invert(92%) hue-rotate(180deg);
+}
+
+.contact-map iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.contact-info {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-info div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.contact-info dt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.contact-info dd {
+  margin: 0;
+  text-align: right;
+  color: var(--ink);
+}
+
+.contact-info a {
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.contact-info a:hover {
+  color: var(--accent);
+}
+
+.contact-socials {
+  display: flex;
+  gap: 18px;
+}
+
+.contact-socials a {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.contact-socials a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Not found ---------- */
+.not-found {
+  text-align: center;
+  padding: 140px 0;
+}
+
+.not-found h1 {
+  margin: 12px 0 16px;
+}
+
+.not-found p {
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  position: relative;
+  background: var(--bg-soft);
+  border-top: 1px solid var(--line);
+  padding-top: 56px;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--gradient-brand);
+  opacity: 0.5;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 40px;
+  padding-bottom: 40px;
+}
+
+.footer-about .brand {
+  margin-bottom: 14px;
+}
+
+.footer-tagline {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 36ch;
+  margin: 0 0 20px;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 18px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.footer-socials a,
+.footer-nav a {
+  text-decoration: none;
+  color: var(--muted);
+}
+
+.footer-socials a:hover,
+.footer-nav a:hover {
+  color: var(--accent);
+}
+
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.footer-nav p {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 4px;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 860px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 28px 28px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- WhatsApp live chat widget ---------- */
+.wa-chat {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.wa-float {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 26px rgba(37, 211, 102, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.wa-float:hover {
+  transform: scale(1.07);
+  box-shadow: 0 10px 32px rgba(37, 211, 102, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.wa-float-close {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.wa-panel {
+  /* min() menjaga panel tidak overflow di layar sangat sempit
+     (mis. 320px) — 48px = margin kiri-kanan gabungan yang aman. */
+  width: min(300px, calc(100vw - 48px));
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: waPanelIn 0.25s ease both;
+}
+
+@keyframes waPanelIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.wa-panel-header {
+  background: linear-gradient(135deg, #1f7a4d, #14a672);
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.wa-panel-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.wa-panel-status {
+  margin: 4px 0 0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.9;
+}
+
+.wa-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7cffc4;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(124, 255, 196, 0.8);
+}
+
+.wa-panel-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.wa-panel-body {
+  padding: 16px 18px;
+}
+
+.wa-bubble {
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+
+.wa-quick-replies {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wa-quick-reply {
+  display: block;
+  text-decoration: none;
+  font-size: 13px;
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+
+.wa-quick-reply:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(124, 255, 196, 0.05);
+}
+
+.wa-panel-cta {
+  display: block;
+  text-align: center;
+  background: #25d366;
+  color: #06110c;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 14px;
+}
+
+.wa-panel-cta:hover {
+  background: #33e07a;
+}
+
+/* =====================================================================
+   MOBILE ACTION BAR — pola app-like: CTA utama + WhatsApp selalu ada
+   dalam jangkauan ibu jari di layar kecil, dan sekaligus mengisi ruang
+   kosong paling bawah viewport saat halaman di-scroll di HP.
+   Disembunyikan total di desktop.
+   ===================================================================== */
+.mobile-action-bar {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .mobile-action-bar {
+    display: flex;
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 55;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 16px;
+    background: rgba(23, 27, 38, 0.88);
+    border: 1px solid var(--line-strong);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    /* Menghormati area aman di HP dengan gesture bar/notch bawah. */
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .mobile-action-bar::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: var(--gradient-brand);
+    opacity: 0.6;
+  }
+
+  .mobile-action-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 11px;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    background: transparent;
+  }
+
+  .mobile-action-item:active {
+    transform: scale(0.97);
+  }
+
+  .mobile-action-primary {
+    flex: 1.4;
+    background: var(--gradient-brand);
+    color: #06110c;
+    border-color: transparent;
+    box-shadow: 0 10px 26px -10px rgba(124, 255, 196, 0.55);
+  }
+
+  /* Beri ruang di bagian bawah supaya konten & footer tidak
+     tertutup bar yang fixed. */
+  main {
+    padding-bottom: 84px;
+  }
+
+  /* Widget WhatsApp mengambang digeser ke atas supaya tidak bertumpuk
+     dengan action bar baru, dan dikecilkan sedikit di mobile. */
+  .wa-chat {
+    bottom: 92px;
+    right: 16px;
+  }
+
+  .wa-float {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-action-item span {
+    font-size: 13px;
+  }
+}

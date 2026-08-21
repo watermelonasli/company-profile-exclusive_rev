@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://katalis-digital.netlify.app/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/tentang-kami</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/layanan</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/portofolio</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/portofolio/sigap-logistik</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/portofolio/bank-mitra</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/portofolio/warungku-pos</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/portofolio/edulearn</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/blog</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/blog/memilih-tech-stack-startup</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/blog/checklist-keamanan-aplikasi</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/blog/dari-mvp-ke-scale</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/blog/tren-produk-digital-2026</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/testimoni-faq</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/karier</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://katalis-digital.netlify.app/kontak</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+</urlset>
