@@ -876,6 +876,7 @@ h1, h2, h3 {
     transparent 60%
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   /* Resting opacity > 0: efek border-glow tetap kelihatan walau kartu
